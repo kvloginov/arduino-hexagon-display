@@ -16,37 +16,44 @@
 #include "matrix.h"
 #include <RunningGFX.h>
 #include "palettes.h"
+#include <WiFiConnector.h>
+#include <Looper.h>
+#include "settings.h"
+#include <GyverNTP.h>
 
-// void palletteAdd()
-// {
-//   String str = Serial.readString();
-//   if (str.equals("+"))
-//   {
-//     CHOOSEN_PALLETTE++;
-//     Serial.printf("Pallette changed to %d\n\r", CHOOSEN_PALLETTE);
-//   }
-// }
 
 void setup()
 {
-  // Serial.begin(115200);
+  Serial.begin(115200);
 
-  // Serial.onReceive(palletteAdd);
+  WiFiConnector.setName("MyNewWIFIFIFIFIFIFI");
+
+  WiFiConnector.onConnect([]()
+                          {
+      NTP.begin();
+      Serial.print("Connected: ");
+      Serial.println(WiFi.localIP()); 
+      });
+
+  WiFiConnector.onError([]()
+                        {
+      String str("Error! AP: ");
+      Serial.println(WiFi.localIP()); });
+
   matrix.setModeXY();
   matrix.begin();
 }
 
-uint16_t lastPalletteSwithMS = 0;
-
 void loop()
 {
-  if (lastPalletteSwithMS >= 10000)
-  {
-    lastPalletteSwithMS = 0;
-    CHOOSEN_PALLETTE = (CHOOSEN_PALLETTE + 1) % PAL_AMOUNT;
-  }
-  drawBack();
-  drawChoosenPallette(CHOOSEN_PALLETTE);
-  lastPalletteSwithMS += 50;
-  delay(50);
+   Looper.loop();
 }
+
+LP_TIMER_("redraw", 50, []() {
+    Looper.thisTimer()->restart(50);
+    
+    CHOOSEN_PALLETTE = db[kk::back_pal];
+
+    drawBack();
+    // drawChoosenPallette(CHOOSEN_PALLETTE);
+});
