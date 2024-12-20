@@ -1,5 +1,4 @@
 #include "palettes.h"
-
 #include <FastLED.h>
 
 DEFINE_GRADIENT_PALETTE(Fire_gp){

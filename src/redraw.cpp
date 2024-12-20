@@ -20,7 +20,7 @@ void drawBack()
     {
         for (int x = 0; x < matrix.width(); x++)
         {
-            if (matrix.ledXY(x, y) < 0)
+            if (matrix.ledXY(x, y) == NM)
                 continue;
             uint32_t col = getPaletteColor(pal, inoise16(x * scale * 64, y * scale * 64, count * 32), bright);
             matrix.setLED(x, y, col);

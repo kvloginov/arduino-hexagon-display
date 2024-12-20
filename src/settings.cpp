@@ -90,14 +90,6 @@ static void build(sets::Builder &b)
         }
     }
 
-    // if (b.Confirm("ota_update"_h))
-    // {
-    //     if (b.build.value.toBool())
-    //     {
-    //         Serial.println("OTA update!");
-    //     }
-    // }
-
     // if (b.build.isAction())
     // {
     //     switch (b.build.id)
@@ -171,6 +163,3 @@ LP_TICKER([]()
     sett.tick();
     NTP.tick(); 
     });
-
-// LP_TIMER(1000, []()
-//          { Serial.printf("connected:%d, status: %d, wifiMode: %d\n", WiFiConnector.connected(), WiFi.status(), WiFi.getMode()); });

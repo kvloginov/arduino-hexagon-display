@@ -19,6 +19,14 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "chrono": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "compare": "cpp",
+        "functional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "ranges": "cpp",
+        "ratio": "cpp",
+        "variant": "cpp",
+        "thread": "cpp"
     }
 }

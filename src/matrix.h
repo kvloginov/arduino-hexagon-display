@@ -2,13 +2,18 @@
 
 // #define MX_LED_AMOUNT 128
 #define MX_LED_AMOUNT 37
-#define MX_XY_W 13
-#define MX_XY_H 7
+#define MX_XY_VIRT_W 13
+#define MX_XY_VIRT_H 13
+#define MX_REAL_H (MX_XY_VIRT_H / 2) + 1
+// not mapped pixel
+#define NM UINT8_MAX
 
 // BallMatrix
-class BallMatrix : public GyverGFX {
-   public:
-    BallMatrix() {
+class BallMatrix : public GyverGFX
+{
+public:
+    BallMatrix()
+    {
         setModeXY();
     }
 
@@ -21,8 +26,10 @@ class BallMatrix : public GyverGFX {
     void clear();
 
     // gfx
-    void fastSet(int x, int y) {
-        if (_buf16 != getColor()) {
+    void fastSet(int x, int y)
+    {
+        if (_buf16 != getColor())
+        {
             _buf16 = getColor();
             _buf32 = getColor24full();
         }
@@ -32,20 +39,25 @@ class BallMatrix : public GyverGFX {
     // matrix
     int ledXY(int x, int y);
 
-    void setLED(int x, int y, uint32_t color) {
+    void setLED(int x, int y, uint32_t color)
+    {
         int led = ledXY(x, y);
-        if (led >= 0) setLED(led, color);
+        if (led != NM)
+            setLED(led, color);
     }
-    uint32_t getLED(int x, int y) {
+    uint32_t getLED(int x, int y)
+    {
         int led = ledXY(x, y);
-        return (led >= 0) ? getLED(led) : 0;
+        return (led != NM) ? getLED(led) : 0;
     }
 
-    void setModeXY() {
+    void setModeXY()
+    {
         _diag_mode = false;
-        size(MX_XY_W, MX_XY_H);
+        size(MX_XY_VIRT_W, MX_XY_VIRT_H);
     }
-   private:
+
+private:
     bool _diag_mode = false;
     uint16_t _buf16;
     uint32_t _buf32;

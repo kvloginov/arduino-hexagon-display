@@ -10,7 +10,6 @@
 //   a LOGIC-LEVEL CONVERTER on the data line is STRONGLY RECOMMENDED.
 // (Skipping these may work OK on your workbench but can fail in the field)
 #include <Adafruit_NeoPixel.h>
-#include "main.h"
 #include "config.h"
 #include "redraw.h"
 #include "matrix.h"
@@ -24,7 +23,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  WiFiConnector.setName("MyNewWIFIFIFIFIFIFI");
+  WiFiConnector.setName(PROJECT_NAME);
 
   WiFiConnector.onConnect([]()
                           {
@@ -47,11 +46,6 @@ void loop()
 }
 
 LP_TIMER_("redraw", 50, []()
-          {
-            Looper.thisTimer()->restart(50);
-
-            CHOOSEN_PALLETTE = db[kk::back_pal];
-
-            drawBack();
-            // drawChoosenPallette(CHOOSEN_PALLETTE);
+          { 
+            drawBack(); 
           });
