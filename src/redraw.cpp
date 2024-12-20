@@ -3,7 +3,7 @@
 #include "palettes.h"
 #include "config.h"
 #include "settings.h"
-
+#include <Looper.h>
 #include <FastLED.h>
 
 void drawBack()
@@ -37,3 +37,6 @@ void drawBack()
 //     }
 //     matrix.update();
 // }
+
+LP_TIMER_("redraw", 50, []()
+          { drawBack(); });

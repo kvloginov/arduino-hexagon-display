@@ -44,8 +44,3 @@ void loop()
 {
   Looper.loop();
 }
-
-LP_TIMER_("redraw", 50, []()
-          { 
-            drawBack(); 
-          });
