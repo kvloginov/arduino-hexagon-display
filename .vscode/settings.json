@@ -17,6 +17,8 @@
         "stdexcept": "cpp",
         "tuple": "cpp",
         "type_traits": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "chrono": "cpp",
+        "mutex": "cpp"
     }
 }

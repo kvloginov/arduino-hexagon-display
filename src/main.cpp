@@ -14,13 +14,11 @@
 #include "config.h"
 #include "redraw.h"
 #include "matrix.h"
-#include <RunningGFX.h>
 #include "palettes.h"
 #include <WiFiConnector.h>
 #include <Looper.h>
 #include "settings.h"
 #include <GyverNTP.h>
-
 
 void setup()
 {
@@ -32,8 +30,7 @@ void setup()
                           {
       NTP.begin();
       Serial.print("Connected: ");
-      Serial.println(WiFi.localIP()); 
-      });
+      Serial.println(WiFi.localIP()); });
 
   WiFiConnector.onError([]()
                         {
@@ -46,14 +43,15 @@ void setup()
 
 void loop()
 {
-   Looper.loop();
+  Looper.loop();
 }
 
-LP_TIMER_("redraw", 50, []() {
-    Looper.thisTimer()->restart(50);
-    
-    CHOOSEN_PALLETTE = db[kk::back_pal];
+LP_TIMER_("redraw", 50, []()
+          {
+            Looper.thisTimer()->restart(50);
 
-    drawBack();
-    // drawChoosenPallette(CHOOSEN_PALLETTE);
-});
+            CHOOSEN_PALLETTE = db[kk::back_pal];
+
+            drawBack();
+            // drawChoosenPallette(CHOOSEN_PALLETTE);
+          });

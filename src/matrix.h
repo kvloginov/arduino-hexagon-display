@@ -1,7 +1,8 @@
 #include <GyverGFX.h>
 
-#define MX_LED_AMOUNT 128
-#define MX_XY_W 39
+// #define MX_LED_AMOUNT 128
+#define MX_LED_AMOUNT 37
+#define MX_XY_W 13
 #define MX_XY_H 7
 
 // BallMatrix

@@ -3,7 +3,7 @@
 #include <GyverNTP.h>
 #include <LittleFS.h>
 #include <Looper.h>
-#include <SettingsGyver.h>
+#include <SettingsAsync.h>
 #include <WiFiConnector.h>
 
 #include "config.h"
@@ -11,7 +11,7 @@
 #include "redraw.h"
 
 GyverDBFile db(&LittleFS, "/data.db");
-static SettingsGyver sett(PROJECT_NAME " v" PROJECT_VER, &db);
+static SettingsAsync sett(PROJECT_NAME " v" PROJECT_VER, &db);
 
 static void update(sets::Updater &u)
 {
@@ -129,8 +129,8 @@ LP_TICKER([]()
         db.begin();
         db.reset();
 
-        db.init(kk::wifi_ssid, "");
-        db.init(kk::wifi_pass, "");
+        db.init(kk::wifi_ssid, "TP-Link_9CFF");
+        db.init(kk::wifi_pass, "CXZasdEWQ12#");
         db.init(kk::show_ip, true);
 
         db.init(kk::ntp_host, "pool.ntp.org");
