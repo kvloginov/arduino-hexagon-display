@@ -12,6 +12,7 @@
 
 GyverDBFile db(&LittleFS, "/data.db");
 static SettingsAsync sett(PROJECT_NAME " v" PROJECT_VER, &db);
+bool backModeFirstLoad = true;
 
 static void update(sets::Updater &u)
 {
@@ -29,9 +30,12 @@ static void build(sets::Builder &b)
     {
         sets::Group g(b, "Фон");
 
-        if (b.Select(kk::back_mode, "Фон", "Нет;Градиент;Перлин"))
-            b.reload();
-
+        if (b.Select(kk::back_mode, "Фон", "Нет;Градиент;Перлин")) {
+            if (!backModeFirstLoad) {
+                b.reload();
+            }
+            backModeFirstLoad = false;
+        }
         if (db[kk::back_mode].toInt())
         {
             b.Select(kk::back_pal, "Палитра", getPaletteList());
