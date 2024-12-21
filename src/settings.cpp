@@ -107,7 +107,7 @@ static void build(sets::Builder &b)
     //     }
     // }
 
-    Looper.getTimer("redraw")->restart(100);
+    // Looper.getTimer("redraw")->restart(100);
     // if (b.Button("restart"_h, "restart")) ESP.restart();
 }
 
@@ -123,7 +123,7 @@ LP_TICKER([]()
 
         LittleFS.begin();
         db.begin();
-        db.reset();
+        // db.reset();
 
         db.init(kk::wifi_ssid, "TP-Link_9CFF");
         db.init(kk::wifi_pass, "CXZasdEWQ12#");
@@ -154,7 +154,7 @@ LP_TICKER([]()
         db.init(kk::back_angle, 0);
         
         auto isCreatedNew = WiFiConnector.connect(db[kk::wifi_ssid].str(), db[kk::wifi_pass].str());
-        Serial.printf("created new?: %d\n", isCreatedNew);
+        Serial.printf("used existed ssid?: %d\n", isCreatedNew);
         Serial.printf("ssid: %s\n", db[kk::wifi_ssid].str());
         sett.begin();
         sett.onBuild(build);

@@ -63,4 +63,26 @@ private:
     uint32_t _buf32;
 };
 
+// TODO: remove all public variables
 extern BallMatrix matrix;
+
+
+struct LedSmoothed {
+    uint8_t led;
+    uint8_t brightness; // 0-255
+};
+
+class HexoPolarSystemRing {
+    uint8_t radius;
+    std::vector<uint8_t> leds;
+public:
+    HexoPolarSystemRing(uint8_t radius,  std::vector<uint8_t> leds) {
+        this->radius = radius;
+        this->leds = leds;
+    }
+
+    std::vector<LedSmoothed> getLedByFract(float_t fract);
+};
+
+// TODO: remove all public variables
+extern HexoPolarSystemRing hexoPolarSystemRing;

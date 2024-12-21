@@ -7,8 +7,10 @@
 #include <Looper.h>
 #include <FastLED.h>
 
-struct GradData {
-    GradData(int x0, int y0, int w, int h, int angle) {
+struct GradData
+{
+    GradData(int x0, int y0, int w, int h, int angle)
+    {
         uint16_t hypot = sqrt(w * w + h * h) / 2;
         cx = x0 + w / 2;
         cy = y0 + h / 2;
@@ -80,6 +82,25 @@ void drawBack()
     }
 }
 
+float_t currentFract = 0.0;
+
+void drawClock()
+{
+    auto leds = hexoPolarSystemRing.getLedByFract(currentFract);
+    currentFract += 0.007;
+    if (currentFract > 1.0)
+    {
+        currentFract = 0.0;
+    }
+    for (auto led : leds)
+    {
+        auto oldColor = matrix.getLED(led.led);
+        auto blended = blend(0xffff00, oldColor, led.brightness);
+        
+        matrix.setLED(led.led, blended.as_uint32_t());
+    }
+}
+
 // void drawChoosenPallette(uint16_t pal)
 // {
 //     for (int i = 0; i < pal + 1; i++)
@@ -90,6 +111,7 @@ void drawBack()
 // }
 
 LP_TIMER_("redraw", 50, []()
-          { 
-            drawBack(); 
-          matrix.update(); });
+          {
+    drawBack();
+    drawClock();
+    matrix.update(); });

@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include <vector>
 
 // static const uint8_t xyToLed[MX_XY_H][MX_XY_W] = {
 //     {NM, NM, NM, 0, NM, 1, NM, 2, NM, 3, NM, 4, NM, 5, NM, 6, NM, 7, NM, 8, NM, 9, NM, 10, NM, 11, NM, 12, NM, 13, NM, 14, NM, 15, NM, 16, NM, NM, NM},
@@ -19,6 +20,7 @@ static const uint8_t xyToLed[MX_REAL_H][MX_XY_VIRT_W] = {
     {NM, NM, NM, 33, NM, 34, NM, 35, NM, 36, NM, NM, NM},
 };
 
+
 int BallMatrix::ledXY(int x, int y)
 {
     // we define only odd rows, so here we should map y's and skip every even rows
@@ -27,4 +29,20 @@ int BallMatrix::ledXY(int x, int y)
     return ((y & 1) ? NM : xyToLed[y >> 1][x]);
 }
 
+// TODO: remove all public variables
 BallMatrix matrix;
+
+// TODO: optimize
+std::vector<LedSmoothed> HexoPolarSystemRing::getLedByFract(float_t fract) {
+    float_t virtLed = fract * leds.size();
+    uint8_t ledOne = floor(virtLed);
+    uint8_t ledTwo = ceil(virtLed);
+    
+    return std::vector<LedSmoothed>{
+        {leds[ledOne], static_cast<uint8_t>(255 * (virtLed - ledOne))}, 
+        {leds[ledTwo], static_cast<uint8_t>(255 * (ledTwo - virtLed))}
+    };
+}
+
+// TODO: remove all public variables
+HexoPolarSystemRing hexoPolarSystemRing = HexoPolarSystemRing(3, std::vector<uint8_t>{0,1,2,3,4,14,15,27,28,36,35,34,33,32,22,21,9,8});
