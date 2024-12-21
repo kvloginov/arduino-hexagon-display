@@ -82,35 +82,69 @@ void drawBack()
     }
 }
 
-float_t currentFract = 0.0;
+float_t fractMin = 0.0;
+float_t fractHour = 0.0;
+float_t baseClockSpeed = 0.1;
+
+float_t incFract(float_t fract, float_t inc)
+{
+    fract += inc;
+    if (fract > 1.0)
+        fract -= 1.0;
+    return fract;
+}
+
+void drawBlended(uint8_t led, uint32_t color, uint8_t brightness)
+{
+    auto oldColor = matrix.getLED(led);
+    auto blended = blend(oldColor, color, brightness);
+    matrix.setLED(led, blended.as_uint32_t());
+}
+
+void drawClockPixel(uint8_t rad, float_t fract, uint32_t color)
+{
+    auto leds = hexoPolarSystem.getLedByFract(rad, fract);
+    for (auto led : leds)
+    {
+        // TODO: Why 255-brightness?
+        drawBlended(led.led, color, 255 - led.brightness);
+    }
+}
+void drawFirstClockPixel(uint8_t rad, float_t fract, uint32_t color)
+{
+    auto leds = hexoPolarSystem.getLedByFract(rad, fract);
+    if (leds.size() == 0)
+        return;
+    matrix.setLED(leds[0].led, color);
+}
+
+void drawClockHelpers(uint32_t color, uint8_t borderBrightness, uint8_t dotBrightness)
+{
+    // border
+    for (auto led : hexoPolarSystem.getRing(2).getLeds())
+    {
+        drawBlended(led, color, borderBrightness);
+    }
+
+    // dots 0, 3, 6, 9
+    drawBlended(hexoPolarSystem.getLedByFract(2, (11) / 12.0f)[0].led, color, dotBrightness);
+    drawBlended(hexoPolarSystem.getLedByFract(2, (2) / 12.0f)[0].led, color, dotBrightness);
+    drawBlended(hexoPolarSystem.getLedByFract(2, (5) / 12.0f)[0].led, color, dotBrightness);
+    drawBlended(hexoPolarSystem.getLedByFract(2, (8) / 12.0f)[0].led, color, dotBrightness);
+}
 
 void drawClock()
 {
-    auto leds = hexoPolarSystemRing.getLedByFract(currentFract);
-    currentFract += 0.007;
-    if (currentFract > 1.0)
-    {
-        currentFract = 0.0;
-    }
-    for (auto led : leds)
-    {
-        auto oldColor = matrix.getLED(led.led);
-        auto blended = blend(0xffff00, oldColor, led.brightness);
-        
-        matrix.setLED(led.led, blended.as_uint32_t());
-    }
+    fractHour = incFract(fractHour, baseClockSpeed / 3600.0);
+    fractMin = incFract(fractMin, baseClockSpeed / 60.0);
+
+    drawClockHelpers(0x44cc44, 30, 60);
+    drawClockPixel(3, fractMin, 0xffffff);
+    drawFirstClockPixel(2, fractHour, 0xff1111);
+    // drawClockPixel(1, fractHour, 0xffff00);
 }
 
-// void drawChoosenPallette(uint16_t pal)
-// {
-//     for (int i = 0; i < pal + 1; i++)
-//     {
-//         matrix.setLED(i, 0xffff00);
-//     }
-//     matrix.update();
-// }
-
-LP_TIMER_("redraw", 50, []()
+LP_TIMER_("redraw", 10, []()
           {
     drawBack();
     drawClock();

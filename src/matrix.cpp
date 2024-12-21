@@ -15,11 +15,10 @@ static const uint8_t xyToLed[MX_REAL_H][MX_XY_VIRT_W] = {
     {NM, NM, 8, NM, 7, NM, 6, NM, 5, NM, 4, NM, NM},
     {NM, 9, NM, 10, NM, 11, NM, 12, NM, 13, NM, 14, NM},
     {21, NM, 20, NM, 19, NM, 18, NM, 17, NM, 16, NM, 15},
-    {NM,22, NM, 23, NM, 24, NM, 25, NM, 26, NM, 27, NM},
+    {NM, 22, NM, 23, NM, 24, NM, 25, NM, 26, NM, 27, NM},
     {NM, NM, 32, NM, 31, NM, 30, NM, 29, NM, 28, NM, NM},
     {NM, NM, NM, 33, NM, 34, NM, 35, NM, 36, NM, NM, NM},
 };
-
 
 int BallMatrix::ledXY(int x, int y)
 {
@@ -33,16 +32,34 @@ int BallMatrix::ledXY(int x, int y)
 BallMatrix matrix;
 
 // TODO: optimize
-std::vector<LedSmoothed> HexoPolarSystemRing::getLedByFract(float_t fract) {
+std::vector<LedSmoothed> HexoPolarSystemRing::getLedByFract(float_t fract)
+{
     float_t virtLed = fract * leds.size();
     uint8_t ledOne = floor(virtLed);
     uint8_t ledTwo = ceil(virtLed);
-    
+    uint8_t brighnessOne = 255 * (virtLed - ledOne);
+    uint8_t brighnessTwo = 255 * (ledTwo - virtLed);
+
+    if (ledOne == ledTwo)
+        return std::vector<LedSmoothed>{{leds[ledOne], 255}};
+    if (ledTwo >= leds.size())
+        ledTwo = ledTwo % leds.size();
+
     return std::vector<LedSmoothed>{
-        {leds[ledOne], static_cast<uint8_t>(255 * (virtLed - ledOne))}, 
-        {leds[ledTwo], static_cast<uint8_t>(255 * (ledTwo - virtLed))}
-    };
+        {leds[ledOne], brighnessOne},
+        {leds[ledTwo], brighnessTwo}};
+}
+
+std::vector<LedSmoothed> HexoPolarSystem::getLedByFract(uint8_t radius, float_t fract)
+{
+    if (radius < rings.size())
+        return rings[radius].getLedByFract(fract);
+    return std::vector<LedSmoothed>();
 }
 
 // TODO: remove all public variables
-HexoPolarSystemRing hexoPolarSystemRing = HexoPolarSystemRing(3, std::vector<uint8_t>{0,1,2,3,4,14,15,27,28,36,35,34,33,32,22,21,9,8});
+HexoPolarSystem hexoPolarSystem = HexoPolarSystem(std::vector<HexoPolarSystemRing>{
+    {HexoPolarSystemRing(0, std::vector<uint8_t>{18})},
+    {HexoPolarSystemRing(1, std::vector<uint8_t>{11, 12, 17, 25, 24, 19})},
+    {HexoPolarSystemRing(2, std::vector<uint8_t>{7, 6, 5, 13, 16, 26, 29, 30, 31, 23, 20, 10})},
+    {HexoPolarSystemRing(3, std::vector<uint8_t>{0, 1, 2, 3, 4, 14, 15, 27, 28, 36, 35, 34, 33, 32, 22, 21, 9, 8})}});
