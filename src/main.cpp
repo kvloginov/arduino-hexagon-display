@@ -33,8 +33,10 @@ void setup()
 
   WiFiConnector.onError([]()
                         {
-      String str("Error! AP: ");
-      Serial.println(WiFi.localIP()); });
+      Serial.print("Error! AP: ");
+      Serial.println(WiFi.localIP()); 
+      WiFiConnector.connect(""); // start our own AP
+      });
 
   matrix.setModeXY();
   matrix.begin();

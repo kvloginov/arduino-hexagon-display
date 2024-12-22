@@ -92,7 +92,8 @@ static void build(sets::Builder &b)
 LP_LISTENER_("wifi_connect", []()
              {
     db.update();
-    WiFiConnector.connect(db[kk::wifi_ssid], db[kk::wifi_pass]); });
+    WiFiConnector.connect(db[kk::wifi_ssid], db[kk::wifi_pass]); 
+    });
 
 LP_TICKER([]()
           {
