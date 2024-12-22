@@ -12,7 +12,6 @@
 
 GyverDBFile db(&LittleFS, "/data.db");
 static SettingsAsync sett(PROJECT_NAME " v" PROJECT_VER, &db);
-bool backModeFirstLoad = true;
 
 static void update(sets::Updater &u)
 {
@@ -27,12 +26,17 @@ static void build(sets::Builder &b)
     }
     {
         sets::Group g(b, "Часы");
-        b.Switch(kk::clock_enabled, "Включить часы?");
+        if (b.Switch(kk::clock_enabled, "Включить часы?"))
+        {
+            b.reload();
+        }
         if (db[kk::clock_enabled])
         {
-            b.Slider(kk::clock_rotation, "Поворот часов, град.", 0, 359);
+            b.Switch(kk::clock_face_enabled, "Включить циферблат?");
+            b.Slider(kk::clock_rotation, "Поворот часов, град.", 0, 331);
 
-             b.Input(kk::ntp_gmt, "Часовой пояс");
+            b.Paragraph("---");
+            b.Input(kk::ntp_gmt, "Часовой пояс");
             b.Input(kk::ntp_host, "NTP сервер");
             b.LED("synced"_h, "Синхронизирован", NTP.synced());
             b.Label("local_time"_h, "Локальное время", NTP.timeToString());
@@ -41,14 +45,9 @@ static void build(sets::Builder &b)
     }
     {
         sets::Group g(b, "Фон");
-
         if (b.Select(kk::back_mode, "Фон", "Нет;Градиент;Перлин"))
         {
-            if (!backModeFirstLoad)
-            {
-                b.reload();
-            }
-            backModeFirstLoad = false;
+            b.reload();
         }
         if (db[kk::back_mode].toInt())
         {
@@ -115,7 +114,8 @@ LP_TICKER([]()
         db.init(kk::bright, 100);
 
         db.init(kk::clock_enabled, true);
-        db.init(kk::clock_rotation, 60);
+        db.init(kk::clock_rotation, 359);
+        db.init(kk::clock_face_enabled, true);
         // db.init(kk::clock_style, 1);
         // db.init(kk::clock_color, 0xffffff);
 

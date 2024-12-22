@@ -140,7 +140,6 @@ void drawClockTime(Datime dt)
     fractMin = dt.minute / 60.0;
     fractMin += dt.second / 3600.0;
 
-    drawClockHelpers(0x44cc44, 30, 60);
     drawClockPixel(3, fractMin, 0xffffff);
     drawFirstClockPixel(2, fractHour, 0xff1111);
 }
@@ -151,6 +150,11 @@ void drawClock()
         return;
     }
     Datime dt(NTP);
+
+    if (db[kk::clock_face_enabled])
+    {
+        drawClockHelpers(0x44cc44, 30, 60);
+    }
     drawClockTime(dt);
 }
 
