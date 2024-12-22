@@ -21,17 +21,31 @@ static void update(sets::Updater &u)
 
 static void build(sets::Builder &b)
 {
-    // {
-    //     sets::Group g(b, "Часы");
+    {
+        sets::Group g(b, "Общие");
+        b.Slider(kk::bright, "Яркость", 0, 255);
+    }
+    {
+        sets::Group g(b, "Часы");
+        b.Switch(kk::clock_enabled, "Включить часы?");
+        if (db[kk::clock_enabled])
+        {
+            b.Slider(kk::clock_rotation, "Поворот часов, град.", 0, 359);
 
-    //     b.Select(kk::clock_style, "Шрифт", "Нет;Тип 1;Тип 2;Тип 3");
-    //     b.Color(kk::clock_color, "Цвет");
-    // }
+             b.Input(kk::ntp_gmt, "Часовой пояс");
+            b.Input(kk::ntp_host, "NTP сервер");
+            b.LED("synced"_h, "Синхронизирован", NTP.synced());
+            b.Label("local_time"_h, "Локальное время", NTP.timeToString());
+        }
+        // b.Color(kk::clock_color, "Цвет");
+    }
     {
         sets::Group g(b, "Фон");
 
-        if (b.Select(kk::back_mode, "Фон", "Нет;Градиент;Перлин")) {
-            if (!backModeFirstLoad) {
+        if (b.Select(kk::back_mode, "Фон", "Нет;Градиент;Перлин"))
+        {
+            if (!backModeFirstLoad)
+            {
                 b.reload();
             }
             backModeFirstLoad = false;
@@ -46,42 +60,6 @@ static void build(sets::Builder &b)
         }
     }
     {
-        sets::Group g(b, "Яркость");
-        if (b.Switch(kk::auto_bright, "Автояркость"))
-            b.reload();
-        b.Label("adc_val"_h, "Сигнал с датчика");
-
-        if (db[kk::auto_bright])
-        {
-            b.Slider(kk::bright_min, "Мин.", 0, 255);
-            b.Slider(kk::bright_max, "Макс.", 0, 255);
-        }
-        else
-        {
-            b.Slider(kk::bright, "Яркость", 0, 255);
-        }
-    }
-    // {
-    //     sets::Group g(b, "Ночной режим");
-
-    //     if (b.Switch(kk::night_mode, "Включен"))
-    //         b.reload();
-
-    //     if (db[kk::night_mode])
-    //     {
-    //         b.Color(kk::night_color, "Цвет");
-    //         b.Slider(kk::night_trsh, "Порог", 0, 1023);
-    //     }
-    // }
-    // {
-    //     sets::Group g(b, "Время");
-
-    //     b.Input(kk::ntp_gmt, "Часовой пояс");
-    //     b.Input(kk::ntp_host, "NTP сервер");
-    //     b.LED("synced"_h, "Синхронизирован", NTP.synced());
-    //     b.Label("local_time"_h, "Локальное время", NTP.timeToString());
-    // }
-    {
         sets::Group g(b, "WiFi");
 
         b.Switch(kk::show_ip, "Показывать IP");
@@ -94,21 +72,22 @@ static void build(sets::Builder &b)
         }
     }
 
-    // if (b.build.isAction())
-    // {
-    //     switch (b.build.id)
-    //     {
-    //     case kk::ntp_gmt:
-    //         NTP.setGMT(b.build.value);
-    //         break;
-    //     case kk::ntp_host:
-    //         NTP.setHost(b.build.value);
-    //         break;
-    //     }
-    // }
+    if (b.build.isAction())
+    {
+        switch (b.build.id)
+        {
+        case kk::ntp_gmt:
+            NTP.setGMT(b.build.value);
+            break;
+        case kk::ntp_host:
+            NTP.setHost(b.build.value);
+            break;
+        }
+    }
 
-    // Looper.getTimer("redraw")->restart(100);
-    // if (b.Button("restart"_h, "restart")) ESP.restart();
+    Looper.getTimer("redraw")->restart(100);
+    if (b.Button("restart"_h, "restart"))
+        ESP.restart();
 }
 
 LP_LISTENER_("wifi_connect", []()
@@ -130,21 +109,15 @@ LP_TICKER([]()
         db.init(kk::show_ip, true);
 
         db.init(kk::ntp_host, "pool.ntp.org");
-        db.init(kk::ntp_gmt, 3);
+        db.init(kk::ntp_gmt, 5);
 
+        
         db.init(kk::bright, 100);
-        db.init(kk::auto_bright, false);
-        db.init(kk::bright_min, 10);
-        db.init(kk::bright_max, 255);
-        db.init(kk::adc_min, 0);
-        db.init(kk::adc_max, 1023);
 
-        db.init(kk::night_mode, false);
-        db.init(kk::night_color, 0xff0000);
-        db.init(kk::night_trsh, 50);
-
-        db.init(kk::clock_style, 1);
-        db.init(kk::clock_color, 0xffffff);
+        db.init(kk::clock_enabled, true);
+        db.init(kk::clock_rotation, 60);
+        // db.init(kk::clock_style, 1);
+        // db.init(kk::clock_color, 0xffffff);
 
         db.init(kk::back_mode, 1);
         db.init(kk::back_pal, 0);
@@ -165,5 +138,4 @@ LP_TICKER([]()
     }
     WiFiConnector.tick();
     sett.tick();
-    NTP.tick(); 
-    });
+    NTP.tick(); });

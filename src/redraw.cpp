@@ -4,6 +4,7 @@
 #include "config.h"
 #include "settings.h"
 #include "brezline.h"
+#include <GyverNTP.h>
 #include <Looper.h>
 #include <FastLED.h>
 
@@ -36,7 +37,6 @@ void drawBack()
     uint8_t bright = db[kk::back_bright];
 
     matrix.setModeXY();
-    matrix.setBright(bright);
 
     switch (db[kk::back_mode].toInt())
     {
@@ -82,15 +82,13 @@ void drawBack()
     }
 }
 
-float_t fractMin = 0.0;
-float_t fractHour = 0.0;
-float_t baseClockSpeed = 0.1;
-
-float_t incFract(float_t fract, float_t inc)
+float_t turnFractByAngleDeg(float_t fract, int angle)
 {
-    fract += inc;
+    fract = fract + angle / 360.0;
     if (fract > 1.0)
         fract -= 1.0;
+    if (fract < 0.0)
+        fract += 1.0;
     return fract;
 }
 
@@ -103,16 +101,16 @@ void drawBlended(uint8_t led, uint32_t color, uint8_t brightness)
 
 void drawClockPixel(uint8_t rad, float_t fract, uint32_t color)
 {
-    auto leds = hexoPolarSystem.getLedByFract(rad, fract);
+    auto leds = hexoPolarSystem.getLedByFract(rad, turnFractByAngleDeg(fract, db[kk::clock_rotation]));
     for (auto led : leds)
     {
-        // TODO: Why 255-brightness?
+        // TODO: fix 255-brightness
         drawBlended(led.led, color, 255 - led.brightness);
     }
 }
 void drawFirstClockPixel(uint8_t rad, float_t fract, uint32_t color)
 {
-    auto leds = hexoPolarSystem.getLedByFract(rad, fract);
+    auto leds = hexoPolarSystem.getLedByFract(rad, turnFractByAngleDeg(fract, db[kk::clock_rotation]));
     if (leds.size() == 0)
         return;
     matrix.setLED(leds[0].led, color);
@@ -127,25 +125,38 @@ void drawClockHelpers(uint32_t color, uint8_t borderBrightness, uint8_t dotBrigh
     }
 
     // dots 0, 3, 6, 9
-    drawBlended(hexoPolarSystem.getLedByFract(2, (11) / 12.0f)[0].led, color, dotBrightness);
-    drawBlended(hexoPolarSystem.getLedByFract(2, (2) / 12.0f)[0].led, color, dotBrightness);
-    drawBlended(hexoPolarSystem.getLedByFract(2, (5) / 12.0f)[0].led, color, dotBrightness);
-    drawBlended(hexoPolarSystem.getLedByFract(2, (8) / 12.0f)[0].led, color, dotBrightness);
+    drawBlended(hexoPolarSystem.getLedByFract(2, turnFractByAngleDeg(0 / 12.0f, db[kk::clock_rotation]))[0].led, color, dotBrightness);
+    drawBlended(hexoPolarSystem.getLedByFract(2, turnFractByAngleDeg(3 / 12.0f, db[kk::clock_rotation]))[0].led, color, dotBrightness);
+    drawBlended(hexoPolarSystem.getLedByFract(2, turnFractByAngleDeg(6 / 12.0f, db[kk::clock_rotation]))[0].led, color, dotBrightness);
+    drawBlended(hexoPolarSystem.getLedByFract(2, turnFractByAngleDeg(9 / 12.0f, db[kk::clock_rotation]))[0].led, color, dotBrightness);
 }
 
-void drawClock()
+float_t fractMin = 0.0;
+float_t fractHour = 0.0;
+float_t baseClockSpeed = 0.1;
+void drawClockTime(Datime dt)
 {
-    fractHour = incFract(fractHour, baseClockSpeed / 3600.0);
-    fractMin = incFract(fractMin, baseClockSpeed / 60.0);
+    fractHour = (dt.hour % 12) / 12.0;
+    fractMin = dt.minute / 60.0;
+    fractMin += dt.second / 3600.0;
 
     drawClockHelpers(0x44cc44, 30, 60);
     drawClockPixel(3, fractMin, 0xffffff);
     drawFirstClockPixel(2, fractHour, 0xff1111);
-    // drawClockPixel(1, fractHour, 0xffff00);
+}
+void drawClock()
+{
+    if (!db[kk::clock_enabled] || !NTP.synced())
+    {
+        return;
+    }
+    Datime dt(NTP);
+    drawClockTime(dt);
 }
 
-LP_TIMER_("redraw", 10, []()
+LP_TIMER_("redraw", 50, []()
           {
+    matrix.setBright(db[kk::bright]);
     drawBack();
     drawClock();
     matrix.update(); });
