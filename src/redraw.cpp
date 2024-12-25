@@ -143,6 +143,7 @@ void drawClockTime(Datime dt)
     drawClockPixel(3, fractMin, 0xffffff);
     drawFirstClockPixel(2, fractHour, 0xff1111);
 }
+
 void drawClock()
 {
     if (!db[kk::clock_enabled] || !NTP.synced())
@@ -158,9 +159,14 @@ void drawClock()
     drawClockTime(dt);
 }
 
+
+
 LP_TIMER_("redraw", 50, []()
           {
+    matrix.setModeXY();
     matrix.setBright(db[kk::bright]);
     drawBack();
     drawClock();
-    matrix.update(); });
+    matrix.update(); 
+    
+    });

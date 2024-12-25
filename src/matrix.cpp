@@ -20,6 +20,23 @@ static const uint8_t xyToLed[MX_REAL_H][MX_XY_VIRT_W] = {
     {NM, NM, NM, 33, NM, 34, NM, 35, NM, 36, NM, NM, NM},
 };
 
+static const uint8_t diagToLed[MX_DIAG_H][MX_DIAG_W] = {
+    {0, 1, 2, 3, NM, NM, NM},
+    {8, 7, 6, 5, 4, NM, NM},
+    {9, 10, 11, 12, 13, 14, NM},
+    {21, 20, 19, 18, 17, 16, 15},
+    {NM, 22, 23, 24, 25, 26, 27},
+    {NM, NM, 32, 31, 30, 29, 28},
+    {NM, NM, NM, 33, 34, 35, 36},
+};
+
+int BallMatrix::ledDiag(int x, int y)
+{
+    if (x < 0 || y < 0 || x >= MX_DIAG_W || y >= MX_DIAG_H)
+        return NM;
+    return diagToLed[y][x];
+}
+
 int BallMatrix::ledXY(int x, int y)
 {
     // we define only odd rows, so here we should map y's and skip every even rows

@@ -5,6 +5,8 @@
 #define MX_XY_VIRT_W 13
 #define MX_XY_VIRT_H 13
 #define MX_REAL_H (MX_XY_VIRT_H / 2) + 1
+#define MX_DIAG_W 7
+#define MX_DIAG_H 7
 // not mapped pixel
 #define NM UINT8_MAX
 
@@ -38,16 +40,17 @@ public:
 
     // matrix
     int ledXY(int x, int y);
+    int ledDiag(int x, int y);
 
     void setLED(int x, int y, uint32_t color)
     {
-        int led = ledXY(x, y);
+        int led = _diag_mode ? ledDiag(x, y) : ledXY(x, y);
         if (led != NM)
             setLED(led, color);
     }
     uint32_t getLED(int x, int y)
     {
-        int led = ledXY(x, y);
+        int led = _diag_mode ? ledDiag(x, y) : ledXY(x, y);
         return (led != NM) ? getLED(led) : 0;
     }
 
@@ -55,6 +58,12 @@ public:
     {
         _diag_mode = false;
         size(MX_XY_VIRT_W, MX_XY_VIRT_H);
+    }
+
+    void setModeDiag()
+    {
+        _diag_mode = true;
+        size(MX_DIAG_W, MX_DIAG_H);
     }
 
 private:
