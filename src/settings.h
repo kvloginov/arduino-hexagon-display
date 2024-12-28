@@ -19,6 +19,8 @@ DB_KEYS(
     clock_enabled,
     clock_face_enabled,
     clock_rotation,
+    clock_min_color,
+    clock_hour_color,
 
     back_mode, // 0 none, 1 grad, 2 perlin
     back_pal,

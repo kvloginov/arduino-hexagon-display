@@ -133,15 +133,14 @@ void drawClockHelpers(uint32_t color, uint8_t borderBrightness, uint8_t dotBrigh
 
 float_t fractMin = 0.0;
 float_t fractHour = 0.0;
-float_t baseClockSpeed = 0.1;
 void drawClockTime(Datime dt)
 {
     fractHour = (dt.hour % 12) / 12.0;
     fractMin = dt.minute / 60.0;
     fractMin += dt.second / 3600.0;
 
-    drawClockPixel(3, fractMin, 0xffffff);
-    drawFirstClockPixel(2, fractHour, 0xff1111);
+    drawClockPixel(3, fractMin, db[kk::clock_min_color]);
+    drawFirstClockPixel(2, fractHour, db[kk::clock_hour_color]);
 }
 
 void drawClock()
@@ -159,14 +158,10 @@ void drawClock()
     drawClockTime(dt);
 }
 
-
-
 LP_TIMER_("redraw", 50, []()
           {
-    matrix.setModeXY();
-    matrix.setBright(db[kk::bright]);
-    drawBack();
-    drawClock();
-    matrix.update(); 
-    
-    });
+              matrix.setModeXY();
+              matrix.setBright(db[kk::bright]);
+              drawBack();
+              drawClock();
+              matrix.update(); });
